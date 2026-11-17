@@ -1,0 +1,11 @@
+{
+  "endpoint": "GET /api/registrations",
+  "cases": [
+    { "name": "list all registrations (5)", "url": "/api/registrations", "expectedStatus": 200 },
+    { "name": "students of MS101 (3)", "url": "/api/registrations?courseId=1", "expectedStatus": 200 },
+    { "name": "courses of student 1 (2)", "url": "/api/registrations?studentId=1", "expectedStatus": 200 },
+    { "name": "student 1 in JEE201 (1)", "url": "/api/registrations?studentId=1&courseId=2", "expectedStatus": 200 },
+    { "name": "get registration 1", "url": "/api/registrations/1", "expectedStatus": 200 },
+    { "name": "ERROR registration not found", "url": "/api/registrations/999", "expectedStatus": 404 }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "endpoint": "POST /api/courses",
+  "cases": [
+    { "name": "create course 1 (MS101, capacity 30)", "expectedStatus": 201,
+      "body": { "code": "MS101", "title": "Architecture Microservices", "capacity": 30 } },
+    { "name": "create course 2 (JEE201, capacity 2 -> used to test 'full')", "expectedStatus": 201,
+      "body": { "code": "JEE201", "title": "Java EE", "capacity": 2 } },
+    { "name": "create course 3 (DB301, capacity 25)", "expectedStatus": 201,
+      "body": { "code": "DB301", "title": "Bases de données avancées", "capacity": 25 } },
+    { "name": "create course 4 (MS201, capacity 10 -> gets prerequisites in file 14)", "expectedStatus": 201,
+      "body": { "code": "MS201", "title": "Microservices avancés", "capacity": 10 } },
+
+    { "name": "ERROR duplicate code", "expectedStatus": 409,
+      "body": { "code": "MS101", "title": "Copy", "capacity": 10 } },
+    { "name": "ERROR capacity 0", "expectedStatus": 400,
+      "body": { "code": "X100", "title": "Zero capacity", "capacity": 0 } },
+    { "name": "ERROR blank title + missing capacity", "expectedStatus": 400,
+      "body": { "code": "X101", "title": "" } },
+    { "name": "ERROR code longer than 20 chars", "expectedStatus": 400,
+      "body": { "code": "CODE-WAY-TOO-LONG-12345", "title": "Long code", "capacity": 10 } }
+  ]
+}

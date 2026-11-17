@@ -1,0 +1,32 @@
+{
+  "endpoint": "POST /api/courses/{courseId}/prerequisites",
+  "cases": [
+    { "name": "MS201 requires JEE201, or equivalent MS101", "url": "/api/courses/4/prerequisites", "expectedStatus": 201,
+      "body": { "prerequisiteId": 2, "equivalentId": 1 } },
+    { "name": "DB301 requires MS101 (no equivalent)", "url": "/api/courses/3/prerequisites", "expectedStatus": 201,
+      "body": { "prerequisiteId": 1 } },
+
+    { "name": "ERROR course is its own prerequisite", "url": "/api/courses/4/prerequisites", "expectedStatus": 409,
+      "body": { "prerequisiteId": 4 } },
+    { "name": "ERROR equivalent = prerequisite", "url": "/api/courses/4/prerequisites", "expectedStatus": 409,
+      "body": { "prerequisiteId": 3, "equivalentId": 3 } },
+    { "name": "ERROR course is its own equivalent", "url": "/api/courses/4/prerequisites", "expectedStatus": 409,
+      "body": { "prerequisiteId": 3, "equivalentId": 4 } },
+    { "name": "ERROR prerequisite already defined", "url": "/api/courses/4/prerequisites", "expectedStatus": 409,
+      "body": { "prerequisiteId": 2 } },
+    { "name": "ERROR cycle: JEE201 cannot require MS201 (MS201 already requires JEE201)", "url": "/api/courses/2/prerequisites", "expectedStatus": 409,
+      "body": { "prerequisiteId": 4 } },
+    { "name": "ERROR cycle: MS101 cannot require DB301 (DB301 already requires MS101)", "url": "/api/courses/1/prerequisites", "expectedStatus": 409,
+      "body": { "prerequisiteId": 3 } },
+    { "name": "ERROR cycle via equivalent: MS101 cannot require MS201 (MS201 accepts MS101 as equivalent)", "url": "/api/courses/1/prerequisites", "expectedStatus": 409,
+      "body": { "prerequisiteId": 4 } },
+    { "name": "ERROR course not found", "url": "/api/courses/999/prerequisites", "expectedStatus": 404,
+      "body": { "prerequisiteId": 1 } },
+    { "name": "ERROR prerequisite not found", "url": "/api/courses/4/prerequisites", "expectedStatus": 404,
+      "body": { "prerequisiteId": 999 } },
+    { "name": "ERROR equivalent not found", "url": "/api/courses/4/prerequisites", "expectedStatus": 404,
+      "body": { "prerequisiteId": 3, "equivalentId": 999 } },
+    { "name": "ERROR missing prerequisiteId", "url": "/api/courses/4/prerequisites", "expectedStatus": 400,
+      "body": {} }
+  ]
+}

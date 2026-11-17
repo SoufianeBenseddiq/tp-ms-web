@@ -1,0 +1,20 @@
+{
+  "endpoint": "POST /api/exams",
+  "cases": [
+    { "name": "exam 1: MS101 midterm", "expectedStatus": 201,
+      "body": { "courseId": 1, "title": "Contrôle continu", "examDate": "2026-12-05T10:00:00", "room": "Salle B12" } },
+    { "name": "exam 2: MS101 final", "expectedStatus": 201,
+      "body": { "courseId": 1, "title": "Examen final", "examDate": "2027-01-15T09:00:00", "room": "Amphi A" } },
+    { "name": "exam 3: JEE201 final (no room)", "expectedStatus": 201,
+      "body": { "courseId": 2, "title": "Examen final JEE", "examDate": "2027-01-18T14:00:00" } },
+
+    { "name": "ERROR course not found", "expectedStatus": 404,
+      "body": { "courseId": 999, "title": "Ghost exam", "examDate": "2027-01-20T09:00:00" } },
+    { "name": "ERROR missing examDate", "expectedStatus": 400,
+      "body": { "courseId": 1, "title": "No date" } },
+    { "name": "ERROR blank title", "expectedStatus": 400,
+      "body": { "courseId": 1, "title": "", "examDate": "2027-01-20T09:00:00" } },
+    { "name": "ERROR wrong date format", "expectedStatus": 400,
+      "body": { "courseId": 1, "title": "Bad date", "examDate": "20/01/2027" } }
+  ]
+}

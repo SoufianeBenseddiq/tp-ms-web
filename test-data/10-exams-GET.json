@@ -1,0 +1,9 @@
+{
+  "endpoint": "GET /api/exams",
+  "cases": [
+    { "name": "list all exams (3)", "url": "/api/exams", "expectedStatus": 200 },
+    { "name": "exams of MS101, sorted by date (2)", "url": "/api/exams?courseId=1", "expectedStatus": 200 },
+    { "name": "get exam 1", "url": "/api/exams/1", "expectedStatus": 200 },
+    { "name": "ERROR exam not found", "url": "/api/exams/999", "expectedStatus": 404 }
+  ]
+}

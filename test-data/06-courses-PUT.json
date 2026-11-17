@@ -1,0 +1,16 @@
+{
+  "endpoint": "PUT /api/courses/{id}",
+  "cases": [
+    { "name": "update course 1 (title + capacity 40)", "url": "/api/courses/1", "expectedStatus": 200,
+      "body": { "code": "MS101", "title": "Architecture Microservices & Cloud", "capacity": 40 } },
+
+    { "name": "ERROR capacity below enrolled (JEE201 has 2 students)", "url": "/api/courses/2", "expectedStatus": 409,
+      "body": { "code": "JEE201", "title": "Java EE", "capacity": 1 } },
+    { "name": "ERROR code already used by course 3", "url": "/api/courses/1", "expectedStatus": 409,
+      "body": { "code": "DB301", "title": "Architecture Microservices", "capacity": 40 } },
+    { "name": "ERROR course not found", "url": "/api/courses/999", "expectedStatus": 404,
+      "body": { "code": "NONE", "title": "Ghost", "capacity": 10 } },
+    { "name": "ERROR negative capacity", "url": "/api/courses/1", "expectedStatus": 400,
+      "body": { "code": "MS101", "title": "Architecture Microservices", "capacity": -5 } }
+  ]
+}

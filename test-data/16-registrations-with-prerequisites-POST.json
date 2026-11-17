@@ -1,0 +1,19 @@
+{
+  "endpoint": "POST /api/registrations",
+  "notes": "Grades at this point: student 1 -> MS101 avg 16, JEE201 avg 17 | student 2 -> MS101 avg 12, JEE201 no grade | student 3 -> MS101 avg 9.75 | student 4 -> no grade",
+  "cases": [
+    { "name": "student 1 -> MS201 (JEE201 validated: 17)", "expectedStatus": 201,
+      "body": { "studentId": 1, "courseId": 4 } },
+    { "name": "student 2 -> MS201 (JEE201 not validated, but equivalent MS101 validated: 12)", "expectedStatus": 201,
+      "body": { "studentId": 2, "courseId": 4 } },
+    { "name": "student 1 -> DB301 (MS101 validated: 16)", "expectedStatus": 201,
+      "body": { "studentId": 1, "courseId": 3 } },
+
+    { "name": "ERROR student 3 -> MS201 (MS101 avg 9.75 < 10, no JEE201 grade)", "expectedStatus": 409,
+      "body": { "studentId": 3, "courseId": 4 } },
+    { "name": "ERROR student 4 -> MS201 (no grades at all)", "expectedStatus": 409,
+      "body": { "studentId": 4, "courseId": 4 } },
+    { "name": "ERROR student 3 -> DB301 (MS101 avg 9.75 < 10)", "expectedStatus": 409,
+      "body": { "studentId": 3, "courseId": 3 } }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "endpoint": "POST /api/students",
+  "cases": [
+    { "name": "create student 1 (Sara)", "expectedStatus": 201,
+      "body": { "firstName": "Sara", "lastName": "Bennani", "email": "sara.bennani@ecole.ma", "birthDate": "2002-03-01" } },
+    { "name": "create student 2 (Youssef)", "expectedStatus": 201,
+      "body": { "firstName": "Youssef", "lastName": "El Amrani", "email": "youssef.elamrani@ecole.ma", "birthDate": "2001-11-15" } },
+    { "name": "create student 3 (Imane)", "expectedStatus": 201,
+      "body": { "firstName": "Imane", "lastName": "Ouali", "email": "imane.ouali@ecole.ma", "birthDate": "2003-06-20" } },
+    { "name": "create student 4 (Omar, no birthDate)", "expectedStatus": 201,
+      "body": { "firstName": "Omar", "lastName": "Tazi", "email": "omar.tazi@ecole.ma" } },
+
+    { "name": "ERROR duplicate email", "expectedStatus": 409,
+      "body": { "firstName": "Sara", "lastName": "Copy", "email": "sara.bennani@ecole.ma", "birthDate": "2002-03-01" } },
+    { "name": "ERROR blank firstName + invalid email", "expectedStatus": 400,
+      "body": { "firstName": "", "lastName": "Test", "email": "not-an-email" } },
+    { "name": "ERROR missing lastName", "expectedStatus": 400,
+      "body": { "firstName": "Ali", "email": "ali@ecole.ma" } },
+    { "name": "ERROR birthDate in the future", "expectedStatus": 400,
+      "body": { "firstName": "Ali", "lastName": "Future", "email": "ali.future@ecole.ma", "birthDate": "2030-01-01" } }
+  ]
+}

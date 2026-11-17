@@ -1,0 +1,9 @@
+{
+  "endpoint": "GET /api/courses/{courseId}/prerequisites",
+  "cases": [
+    { "name": "prerequisites of MS201 (1: JEE201 or MS101)", "url": "/api/courses/4/prerequisites", "expectedStatus": 200 },
+    { "name": "prerequisites of DB301 (1: MS101)", "url": "/api/courses/3/prerequisites", "expectedStatus": 200 },
+    { "name": "prerequisites of MS101 (empty list)", "url": "/api/courses/1/prerequisites", "expectedStatus": 200 },
+    { "name": "ERROR course not found", "url": "/api/courses/999/prerequisites", "expectedStatus": 404 }
+  ]
+}

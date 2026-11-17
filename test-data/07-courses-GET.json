@@ -1,0 +1,9 @@
+{
+  "endpoint": "GET /api/courses",
+  "cases": [
+    { "name": "list all courses (with enrolled / availableSeats)", "url": "/api/courses", "expectedStatus": 200 },
+    { "name": "get course 1 (enrolled = 3)", "url": "/api/courses/1", "expectedStatus": 200 },
+    { "name": "get course 2 (enrolled = 2, availableSeats = 0)", "url": "/api/courses/2", "expectedStatus": 200 },
+    { "name": "ERROR course not found", "url": "/api/courses/999", "expectedStatus": 404 }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "endpoint": "GET /api/students",
+  "cases": [
+    { "name": "list all students", "url": "/api/students", "expectedStatus": 200 },
+    { "name": "get student 1", "url": "/api/students/1", "expectedStatus": 200 },
+    { "name": "ERROR student not found", "url": "/api/students/999", "expectedStatus": 404 }
+  ]
+}

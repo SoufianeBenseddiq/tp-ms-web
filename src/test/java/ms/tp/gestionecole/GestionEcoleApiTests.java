@@ -1,5 +1,6 @@
 package ms.tp.gestionecole;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -138,5 +139,59 @@ class GestionEcoleApiTests {
         mvc.perform(get("/api/grades").param("studentId", String.valueOf(registered)))
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].examTitle").value("Examen final"));
+    }
+
+    @Test
+    void registration_requiresValidatedPrerequisiteOrEquivalent() throws Exception {
+        long prerequisite = createCourse(10);
+        long equivalent = createCourse(10);
+        long advanced = createCourse(10);
+
+        long viaPrerequisite = createStudent("ViaPrereq");
+        long viaEquivalent = createStudent("ViaEquiv");
+        long failed = createStudent("Failed");
+        long noGrade = createStudent("NoGrade");
+
+        String reg = "{\"studentId\":%d,\"courseId\":%d}";
+        postJson("/api/registrations", reg.formatted(viaPrerequisite, prerequisite)).andExpect(status().isCreated());
+        postJson("/api/registrations", reg.formatted(failed, prerequisite)).andExpect(status().isCreated());
+        postJson("/api/registrations", reg.formatted(viaEquivalent, equivalent)).andExpect(status().isCreated());
+
+        String exam = """
+                {"courseId":%d,"title":"Final","examDate":"2026-12-20T09:00:00"}
+                """;
+        long prerequisiteExam = idOf(postJson("/api/exams", exam.formatted(prerequisite)).andExpect(status().isCreated()));
+        long equivalentExam = idOf(postJson("/api/exams", exam.formatted(equivalent)).andExpect(status().isCreated()));
+
+        String grade = "{\"examId\":%d,\"studentId\":%d,\"score\":%s}";
+        postJson("/api/grades", grade.formatted(prerequisiteExam, viaPrerequisite, "14")).andExpect(status().isCreated());
+        postJson("/api/grades", grade.formatted(prerequisiteExam, failed, "8")).andExpect(status().isCreated());
+        postJson("/api/grades", grade.formatted(equivalentExam, viaEquivalent, "11")).andExpect(status().isCreated());
+
+        String prereqUrl = "/api/courses/" + advanced + "/prerequisites";
+        long linkId = idOf(postJson(prereqUrl, """
+                {"prerequisiteId":%d,"equivalentId":%d}
+                """.formatted(prerequisite, equivalent))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.equivalentId").value(equivalent)));
+
+        // configuration invalide
+        postJson(prereqUrl, "{\"prerequisiteId\":%d}".formatted(advanced)).andExpect(status().isConflict());
+        postJson(prereqUrl, "{\"prerequisiteId\":%d}".formatted(prerequisite)).andExpect(status().isConflict());
+        postJson("/api/courses/" + prerequisite + "/prerequisites", "{\"prerequisiteId\":%d}".formatted(advanced))
+                .andExpect(status().isConflict()); // cycle
+        mvc.perform(get(prereqUrl)).andExpect(jsonPath("$.length()").value(1));
+
+        // inscriptions au module avancé
+        postJson("/api/registrations", reg.formatted(viaPrerequisite, advanced)).andExpect(status().isCreated());
+        postJson("/api/registrations", reg.formatted(viaEquivalent, advanced)).andExpect(status().isCreated());
+        postJson("/api/registrations", reg.formatted(failed, advanced))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("Prérequis non validés")));
+        postJson("/api/registrations", reg.formatted(noGrade, advanced)).andExpect(status().isConflict());
+
+        // après suppression du prérequis, l'inscription est libre
+        mvc.perform(delete(prereqUrl + "/" + linkId)).andExpect(status().isNoContent());
+        postJson("/api/registrations", reg.formatted(noGrade, advanced)).andExpect(status().isCreated());
     }
 }

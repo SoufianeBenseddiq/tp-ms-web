@@ -4,7 +4,8 @@ One Spring Boot project, one MySQL database, one deployment.
 
 - **Student Management**: create, update, view students
 - **Course Management**: create modules (courses) and set their capacity
-- **Registration**: register a student to a module
+- **Registration**: register a student to a module (prerequisites must be validated)
+- **Course prerequisites**: a module can require other modules (or an equivalent module)
 - **Exam & Grade**: schedule exams and record grades
 
 ---
@@ -43,7 +44,7 @@ Tests: `./mvnw test` (in-memory H2, MySQL not required).
 
 ```
 ms.tp.gestionecole
-├── entity          JPA entities: Student, Course, Registration, Exam, Grade
+├── entity          JPA entities: Student, Course, CoursePrerequisite, Registration, Exam, Grade
 ├── repository      Spring Data JPA repositories
 ├── dto             Request / Response records (input validation)
 ├── converter       Entity <-> DTO mapping
@@ -212,11 +213,15 @@ POST /api/registrations
 **Errors**
 - `404`: student or module does not exist
 - `409`: student already registered to this module
+- `409`: prerequisites not validated (see section 6)
 - `409`: module full
 
 ```json
 { "type": "about:blank", "title": "Conflict", "status": 409,
   "detail": "Le module MS101 est complet (capacité 30)", "instance": "/api/registrations" }
+
+{ "type": "about:blank", "title": "Conflict", "status": 409,
+  "detail": "Prérequis non validés pour le module MS201 : JEE201 (ou équivalent MS101)", "instance": "/api/registrations" }
 ```
 
 ---
@@ -319,6 +324,87 @@ POST /api/grades
 - `409`: student is not registered to the exam's module
 - `409`: a grade already exists for this student and exam (use PUT to change it)
 - `400`: score outside 0 to 20
+
+---
+
+## 6. Course prerequisites — `/api/courses/{courseId}/prerequisites`
+
+A module can require other modules. To register to a module, the student must have **validated** every prerequisite,
+**or** its equivalent module when one is defined.
+
+- **Validated** = the student's average of grades in the exams of that module is **≥ 10/20** (no grade = not validated).
+- Several prerequisites on the same module → **all** must be satisfied.
+
+| Method | URL | Description | Success |
+|---|---|---|---|
+| POST | `/api/courses/{courseId}/prerequisites` | Add a prerequisite to a module | `201` |
+| GET | `/api/courses/{courseId}/prerequisites` | List prerequisites of a module | `200` |
+| DELETE | `/api/courses/{courseId}/prerequisites/{id}` | Remove a prerequisite | `204` |
+
+**Payload (POST)**
+
+| Field | Type | Rules |
+|---|---|---|
+| `prerequisiteId` | long | required — module to validate |
+| `equivalentId` | long | optional — alternative module that also satisfies the requirement |
+
+```json
+POST /api/courses/4/prerequisites
+{
+  "prerequisiteId": 2,
+  "equivalentId": 1
+}
+```
+→ "to register to MS201 (4), the student must have validated JEE201 (2) **or** MS101 (1)".
+
+**Response `201`**
+```json
+{
+  "id": 1,
+  "courseId": 4,
+  "courseCode": "MS201",
+  "prerequisiteId": 2,
+  "prerequisiteCode": "JEE201",
+  "equivalentId": 1,
+  "equivalentCode": "MS101"
+}
+```
+
+`GET` returns an array of these objects. `DELETE` returns `204 No Content` (empty body).
+
+**Errors**
+- `404`: module, prerequisite or equivalent does not exist; prerequisite id not found for this module (DELETE)
+- `409`: module is its own prerequisite / own equivalent, or equivalent = prerequisite
+- `409`: this prerequisite is already defined for the module
+- `409`: cycle (e.g. MS201 requires JEE201 → JEE201 cannot require MS201, directly or indirectly)
+- `400`: `prerequisiteId` missing
+
+---
+
+## Test data (`test-data/`)
+
+One JSON file per endpoint, numbered in execution order (IDs depend on previous steps; start from an empty DB with `docker compose down -v && docker compose up -d --build`).
+Each file contains `cases` with a `name`, an `expectedStatus`, an optional `url` and the `body` to paste into Postman.
+
+| File | Endpoint |
+|---|---|
+| `01-students-POST.json` | `POST /api/students` |
+| `02-students-PUT.json` | `PUT /api/students/{id}` |
+| `03-students-GET.json` | `GET /api/students[/{id}]` |
+| `04-courses-POST.json` | `POST /api/courses` |
+| `05-registrations-POST.json` | `POST /api/registrations` |
+| `06-courses-PUT.json` | `PUT /api/courses/{id}` |
+| `07-courses-GET.json` | `GET /api/courses[/{id}]` |
+| `08-registrations-GET.json` | `GET /api/registrations[/{id}]` |
+| `09-exams-POST.json` | `POST /api/exams` |
+| `10-exams-GET.json` | `GET /api/exams[/{id}]` |
+| `11-grades-POST.json` | `POST /api/grades` |
+| `12-grades-PUT.json` | `PUT /api/grades/{id}` |
+| `13-grades-GET.json` | `GET /api/grades[/{id}]` |
+| `14-prerequisites-POST.json` | `POST /api/courses/{courseId}/prerequisites` |
+| `15-prerequisites-GET.json` | `GET /api/courses/{courseId}/prerequisites` |
+| `16-registrations-with-prerequisites-POST.json` | `POST /api/registrations` (prerequisite / equivalent checks) |
+| `17-prerequisites-DELETE.json` | `DELETE /api/courses/{courseId}/prerequisites/{id}` |
 
 ---
 

@@ -1,0 +1,10 @@
+{
+  "endpoint": "PUT /api/grades/{id}",
+  "cases": [
+    { "name": "correct grade 1 -> 16", "url": "/api/grades/1", "expectedStatus": 200, "body": { "score": 16 } },
+
+    { "name": "ERROR score > 20", "url": "/api/grades/2", "expectedStatus": 400, "body": { "score": 21 } },
+    { "name": "ERROR missing score", "url": "/api/grades/2", "expectedStatus": 400, "body": {} },
+    { "name": "ERROR grade not found", "url": "/api/grades/999", "expectedStatus": 404, "body": { "score": 10 } }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "endpoint": "GET /api/grades",
+  "cases": [
+    { "name": "list all grades (4)", "url": "/api/grades", "expectedStatus": 200 },
+    { "name": "grades of exam 1 (3)", "url": "/api/grades?examId=1", "expectedStatus": 200 },
+    { "name": "grades of student 1 (2)", "url": "/api/grades?studentId=1", "expectedStatus": 200 },
+    { "name": "grade of student 2 in exam 1 (1)", "url": "/api/grades?examId=1&studentId=2", "expectedStatus": 200 },
+    { "name": "get grade 1 (score 16 after PUT)", "url": "/api/grades/1", "expectedStatus": 200 },
+    { "name": "ERROR grade not found", "url": "/api/grades/999", "expectedStatus": 404 }
+  ]
+}

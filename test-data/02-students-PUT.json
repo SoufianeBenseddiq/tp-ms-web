@@ -1,0 +1,14 @@
+{
+  "endpoint": "PUT /api/students/{id}",
+  "cases": [
+    { "name": "update student 1 (lastName + email)", "url": "/api/students/1", "expectedStatus": 200,
+      "body": { "firstName": "Sara", "lastName": "El Bennani", "email": "sara.elbennani@ecole.ma", "birthDate": "2002-03-01" } },
+
+    { "name": "ERROR email already used by student 2", "url": "/api/students/1", "expectedStatus": 409,
+      "body": { "firstName": "Sara", "lastName": "El Bennani", "email": "youssef.elamrani@ecole.ma", "birthDate": "2002-03-01" } },
+    { "name": "ERROR student not found", "url": "/api/students/999", "expectedStatus": 404,
+      "body": { "firstName": "Ghost", "lastName": "Student", "email": "ghost@ecole.ma" } },
+    { "name": "ERROR invalid data", "url": "/api/students/1", "expectedStatus": 400,
+      "body": { "firstName": "", "lastName": "", "email": "bad" } }
+  ]
+}

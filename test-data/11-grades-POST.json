@@ -1,0 +1,18 @@
+{
+  "endpoint": "POST /api/grades",
+  "cases": [
+    { "name": "grade 1: student 1, exam 1", "expectedStatus": 201, "body": { "examId": 1, "studentId": 1, "score": 15.5 } },
+    { "name": "grade 2: student 2, exam 1", "expectedStatus": 201, "body": { "examId": 1, "studentId": 2, "score": 12 } },
+    { "name": "grade 3: student 3, exam 1", "expectedStatus": 201, "body": { "examId": 1, "studentId": 3, "score": 9.75 } },
+    { "name": "grade 4: student 1, exam 3 (JEE201)", "expectedStatus": 201, "body": { "examId": 3, "studentId": 1, "score": 17 } },
+
+    { "name": "ERROR grade already exists (use PUT)", "expectedStatus": 409, "body": { "examId": 1, "studentId": 1, "score": 14 } },
+    { "name": "ERROR student 3 not registered to JEE201", "expectedStatus": 409, "body": { "examId": 3, "studentId": 3, "score": 10 } },
+    { "name": "ERROR student 4 not registered to MS101", "expectedStatus": 409, "body": { "examId": 1, "studentId": 4, "score": 10 } },
+    { "name": "ERROR score > 20", "expectedStatus": 400, "body": { "examId": 2, "studentId": 1, "score": 25 } },
+    { "name": "ERROR score < 0", "expectedStatus": 400, "body": { "examId": 2, "studentId": 1, "score": -1 } },
+    { "name": "ERROR more than 2 decimals", "expectedStatus": 400, "body": { "examId": 2, "studentId": 1, "score": 12.345 } },
+    { "name": "ERROR exam not found", "expectedStatus": 404, "body": { "examId": 999, "studentId": 1, "score": 10 } },
+    { "name": "ERROR student not found", "expectedStatus": 404, "body": { "examId": 1, "studentId": 999, "score": 10 } }
+  ]
+}

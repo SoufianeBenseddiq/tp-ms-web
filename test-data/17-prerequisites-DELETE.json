@@ -1,0 +1,8 @@
+{
+  "endpoint": "DELETE /api/courses/{courseId}/prerequisites/{id}",
+  "cases": [
+    { "name": "ERROR prerequisite 2 does not belong to course 4", "url": "/api/courses/4/prerequisites/2", "expectedStatus": 404 },
+    { "name": "remove prerequisite 2 (DB301 requires MS101)", "url": "/api/courses/3/prerequisites/2", "expectedStatus": 204 },
+    { "name": "ERROR already removed", "url": "/api/courses/3/prerequisites/2", "expectedStatus": 404 }
+  ]
+}

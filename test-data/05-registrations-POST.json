@@ -1,0 +1,16 @@
+{
+  "endpoint": "POST /api/registrations",
+  "cases": [
+    { "name": "student 1 -> MS101", "expectedStatus": 201, "body": { "studentId": 1, "courseId": 1 } },
+    { "name": "student 2 -> MS101", "expectedStatus": 201, "body": { "studentId": 2, "courseId": 1 } },
+    { "name": "student 3 -> MS101", "expectedStatus": 201, "body": { "studentId": 3, "courseId": 1 } },
+    { "name": "student 1 -> JEE201", "expectedStatus": 201, "body": { "studentId": 1, "courseId": 2 } },
+    { "name": "student 2 -> JEE201 (course now full: 2/2)", "expectedStatus": 201, "body": { "studentId": 2, "courseId": 2 } },
+
+    { "name": "ERROR course full (JEE201)", "expectedStatus": 409, "body": { "studentId": 3, "courseId": 2 } },
+    { "name": "ERROR already registered", "expectedStatus": 409, "body": { "studentId": 1, "courseId": 1 } },
+    { "name": "ERROR student not found", "expectedStatus": 404, "body": { "studentId": 999, "courseId": 1 } },
+    { "name": "ERROR course not found", "expectedStatus": 404, "body": { "studentId": 1, "courseId": 999 } },
+    { "name": "ERROR missing fields", "expectedStatus": 400, "body": {} }
+  ]
+}
