@@ -11,8 +11,20 @@ One Spring Boot project, one MySQL database, one deployment.
 
 ## Run
 
+**Option A: everything in Docker (MySQL + backend)**
+
 ```bash
-docker compose up -d                       # MySQL 8.4 on localhost:3306 (root/root)
+docker compose up -d --build      # builds the backend image, starts MySQL then the API
+docker compose logs -f backend    # follow backend logs
+docker compose down               # stop (data kept in the mysql-data volume)
+```
+
+The backend waits for MySQL to be healthy before starting. API on http://localhost:8080.
+
+**Option B: MySQL in Docker, backend from the IDE / Maven**
+
+```bash
+docker compose up -d mysql                 # MySQL 8.4 on localhost:3306 (root/root)
 DB_PASSWORD=root ./mvnw spring-boot:run    # API on http://localhost:8080
 ```
 
